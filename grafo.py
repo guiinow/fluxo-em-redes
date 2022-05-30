@@ -26,8 +26,8 @@ class Grafo:
             # Leitura do cabecalho
             str = csv.reader(arq)
             str = str.split(";")
-            self.num_vert = int(str[0])
-            cont_arestas = int(str[1])
+            self.num_vert = 3
+            cont_arestas = 5
             # # Inicializacao das estruturas de dados
             self.lista_adj = [[] for i in range(self.num_vert)]
             self.mat_adj = [[0 for j in range(self.num_vert)]
