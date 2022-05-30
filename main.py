@@ -1,8 +1,14 @@
-import csv
+# import csv
 
-arquivo = open('professores_toy.csv')
+# arquivo = open('professores_toy.csv')
 
-linhas = csv.reader(arquivo)
+# linhas = csv.reader(arquivo)
 
-for linha in linhas:
-    print(linha)
+# for linha in linhas:
+#     print(linha)
+
+import grafo
+
+g1 = grafo.Grafo()
+
+g1.ler_arquivo_professor('professor_toy.csv')
