@@ -1,3 +1,6 @@
+import csv
+
+
 class Grafo:
     def __init__(self, num_vert=0, num_arestas=0, lista_adj=None, mat_adj=None, lista_arestas=None, lista_sem_peso=None):
         self.num_vert = num_vert
@@ -21,21 +24,12 @@ class Grafo:
         # else:
         #     self.lista_sem_peso = lista_arestas
 
-    def add_aresta(self, u, v, w=1):
-        """Adiciona aresta de u a v com peso w"""
-        self.num_arestas += 1
-        if u < self.num_vert and v < self.num_vert:
-            self.lista_adj[u].append((v, w))
-            self.mat_adj[u][v] = w
-        else:
-            print("Aresta invalida!")
-
     def ler_arquivo(self, nome_arq):
         """Le arquivo de grafo no formato dimacs"""
         try:
             arq = open(nome_arq)
             # Leitura do cabecalho
-            str = arq.readline()
+            str = csv.reader(arq)
             str = str.split(" ")
             self.num_vert = int(str[0])
             cont_arestas = int(str[1])
@@ -51,15 +45,5 @@ class Grafo:
                 v = int(str[1])  # Vertice destino
                 w = int(str[2])  # Peso da aresta
                 self.add_aresta(u, v, w)
-                self.lista_arestas.append((u, v, w))
-                selecao = 0
-                if w != 1:
-                    if w < 0:
-                        selecao = 3
-                    else:
-                        selecao = 2
-                else:
-                    selecao = 1
-            return selecao
         except IOError:
             print("Nao foi possivel encontrar ou ler o arquivo!")
