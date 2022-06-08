@@ -11,4 +11,4 @@ import grafo
 
 g1 = grafo.Grafo()
 
-g1.ler_arquivo_professor('professor_toy.csv')
+g1.ler_arquivo_professor('./datasets/professores_toy.csv')
