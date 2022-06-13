@@ -1,6 +1,3 @@
-import csv
-
-
 class Grafo:
     def __init__(self, num_vert=0, num_arestas=0, lista_adj=None, mat_adj=None, lista_arestas=None):
         self.num_vert = num_vert
