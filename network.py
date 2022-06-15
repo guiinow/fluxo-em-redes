@@ -1,10 +1,11 @@
-from cmath import cos
-import pandas as pd
-
+from csv import reader
 
 class Network:
     def __init__(self, size_vertices=0, adjacent_list=None, adjacent_matrix=None, arestas_list=None, cappacity=0, cost=0, demand=None):
         self.size_vertices = size_vertices
+        self.dict = {}
+        self.lista_professores = []
+        self.lista_disciplinas = []
 
         if adjacent_list == None:
             self.adjacent_list = [[] for i in range(size_vertices)]
@@ -39,31 +40,78 @@ class Network:
         else:
             self.demand = demand
 
-    def ler_arquivo(self, nome_arq):
-        """Le arquivo de grafo no formato dimacs"""
+    def ler_arquivo_professores(self, nome_arq):
+
         try:
-            arq = open(nome_arq)
-            # Leitura do cabecalho
-            teste = pd.read_csv(arq, sep=';')
-            # # Inicializacao das estruturas de dados
-            professores = [(int(str[0]), int(str[1]))
-                           for i in range(int(str[0]))]
+            with open(nome_arq, 'r') as csv_file:
+                
+                csv_reader = reader(csv_file, delimiter=';')
+                next(csv_reader) #pula primeira linha
+                self.lista_professores = list(csv_reader)
+                print('\nVetor de professores: \n', self.lista_professores)
         except IOError:
             print("Nao foi possivel encontrar ou ler o arquivo!")
+            return False
+        
+    def ler_arquivo_disciplinas(self, nome_arq):
+        try:
+            with open(nome_arq, 'r') as csv_file:
+                csv_reader = reader(csv_file, delimiter=';')
+                next(csv_reader) #Pula cabeçalho
+                self.lista_disciplinas = list(csv_reader)
+                print('\nVetor de disciplinas: \n', self.lista_disciplinas)
+        except IOError:
+            print("Nao foi possivel encontrar ou ler o arquivo!")
+            return False  
 
-    def create_network(self, arq):
-        # Le cada aresta do arquivo
-        for i in (0, self.num_arestas):
-            teste = pd.read_csv(arq, sep=';')
-            teste = pd.read_csv(arq, sep=';')
-            prof = int(str[0])  # Vertice prof
-            disc = int(str[1])  # Vertice disciplinas
-            p1 = int(str[2])  # Aresta preferencia 1
-            p2 = int(str[3])  # Aresta preferencia 2
-            p3 = int(str[4])  # Aresta preferencia 3
-            p4 = int(str[5])  # Aresta preferencia 4
-            p5 = int(str[6])  # Aresta preferencia 5
-            self.add_aresta((prof, disc, p1, p2, p3, p4, p5))
+    def add_aresta(self, u, v, c, w=1):
+        """Adiciona aresta de u a v com peso w"""
+        if u < self.num_vert and v < self.num_vert:
+            self.num_arestas.append((u,v,w,c))
+            self.mat_adj[u][v] = w
+            self.capacidade[u][v] = c
+        else:
+            print("Aresta invalida!")
+
+    def remove_aresta(self, u, v):
+        """Remove aresta de u a v, se houver"""
+        if u < self.num_vert and v < self.num_vert:
+            if self.mat_adj[u][v] != 0:
+                self.num_arestas += 1
+                self.mat_adj[u][v] = 0
+                for (v2, w2) in self.lista_adj[u]:
+                    if v2 == v:
+                        self.lista_adj[u].remove((v2, w2))
+                        break
+            else:
+                print("Aresta inexistente!")
+        else:
+            print("Aresta invalida!")
+
+
+    def add_Dictionary(self, value, key):
+        self.dict[value] = key
+
+    def criar_rede(self):
+        tamanho_professores = len(self.lista_professores) 
+        tamanho_disciplinas = len(self.lista_disciplinas) 
+        proxima_chave = 0
+        
+        for i in range(tamanho_professores):
+            self.adiciona_dict(self.lista_professores[i][0], i)
+            proxima_chave = i+1
+        
+        for i in range(tamanho_disciplinas):
+            if self.lista_disciplinas[i][0] != None:
+                self.adiciona_dict(self.lista_disciplinas[i][0], proxima_chave)
+                proxima_chave = proxima_chave+1
+        
+        for i in range(tamanho_disciplinas):
+            if self.lista_disciplinas[i][1] != None:
+                self.adiciona_dict(self.lista_disciplinas[i][1], proxima_chave)
+                proxima_chave = proxima_chave+1
+        
+        print('Dicionário: ', self.dict)
 
     def bellman_ford(self, s, t):
         dist = [float("inf")
@@ -97,10 +145,10 @@ class Network:
                 u = C[i-1]
                 v = C[i]
                 F[u][v] += f
-                self.cost[u][v] -= f
-                self.cost[v][u] += f
-                self.demand[s] -= f
-                self.demand[t] += f
+                self.cost[u][v] = self.cost[u][v] - f
+                self.cost[v][u] = self.cost[v][u] + f
+                self.demand[s] = self.demand[s] - f
+                self.demand[t] = self.demand[t] + f
                 if self.cost[u][v] == 0:
                     self.adjacent_matrix[u][v] = 0
                     self.arestas_list.remove((v, u, self.cappacity[u][v]))
