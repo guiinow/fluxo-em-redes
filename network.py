@@ -1,5 +1,6 @@
 from csv import reader
 
+
 class Network:
     def __init__(self, size_vertices=0, adjacent_list=None, adjacent_matrix=None, arestas_list=None, cappacity=0, cost=0, demand=None):
         self.size_vertices = size_vertices
@@ -44,30 +45,30 @@ class Network:
 
         try:
             with open(nome_arq, 'r') as csv_file:
-                
+
                 csv_reader = reader(csv_file, delimiter=';')
-                next(csv_reader) #pula primeira linha
+                next(csv_reader)  # pula primeira linha
                 self.lista_professores = list(csv_reader)
                 print('\nVetor de professores: \n', self.lista_professores)
         except IOError:
             print("Nao foi possivel encontrar ou ler o arquivo!")
             return False
-        
+
     def ler_arquivo_disciplinas(self, nome_arq):
         try:
             with open(nome_arq, 'r') as csv_file:
                 csv_reader = reader(csv_file, delimiter=';')
-                next(csv_reader) #Pula cabeçalho
+                next(csv_reader)  # Pula cabeçalho
                 self.lista_disciplinas = list(csv_reader)
                 print('\nVetor de disciplinas: \n', self.lista_disciplinas)
         except IOError:
             print("Nao foi possivel encontrar ou ler o arquivo!")
-            return False  
+            return False
 
     def add_aresta(self, u, v, c, w=1):
         """Adiciona aresta de u a v com peso w"""
         if u < self.num_vert and v < self.num_vert:
-            self.num_arestas.append((u,v,w,c))
+            self.num_arestas.append((u, v, w, c))
             self.mat_adj[u][v] = w
             self.capacidade[u][v] = c
         else:
@@ -88,29 +89,32 @@ class Network:
         else:
             print("Aresta invalida!")
 
-
     def add_Dictionary(self, value, key):
         self.dict[value] = key
 
     def criar_rede(self):
-        tamanho_professores = len(self.lista_professores) 
-        tamanho_disciplinas = len(self.lista_disciplinas) 
+        tamanho_professores = len(self.lista_professores)
+        tamanho_disciplinas = len(self.lista_disciplinas)
         proxima_chave = 0
-        
+
         for i in range(tamanho_professores):
-            self.adiciona_dict(self.lista_professores[i][0], i)
+            self.dict(self.lista_professores[i][0], i)
             proxima_chave = i+1
-        
+
         for i in range(tamanho_disciplinas):
             if self.lista_disciplinas[i][0] != None:
-                self.adiciona_dict(self.lista_disciplinas[i][0], proxima_chave)
+                self.dict(self.lista_disciplinas[i][0], proxima_chave)
                 proxima_chave = proxima_chave+1
-        
+
         for i in range(tamanho_disciplinas):
             if self.lista_disciplinas[i][1] != None:
-                self.adiciona_dict(self.lista_disciplinas[i][1], proxima_chave)
+                self.dict(self.lista_disciplinas[i][1], proxima_chave)
                 proxima_chave = proxima_chave+1
-        
+
+        for i in range(len(self.lista_professores)-1):
+            self.add_aresta(self.dict[self.lista_professores[-1][1]],
+                            self.dict[self.lista_professores[i][0]], 0, self.lista_professores[i][1])
+
         print('Dicionário: ', self.dict)
 
     def bellman_ford(self, s, t):
