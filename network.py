@@ -5,6 +5,8 @@ class Network:
     def __init__(self, size_vertices=0, adjacent_list=None, adjacent_matrix=None, arestas_list=None, cappacity=0, cost=0, demand=None):
         self.size_vertices = size_vertices
         self.dict = {}
+        self.s = 0
+        self.t = 0
         self.lista_professores = []
         self.lista_disciplinas = []
 
@@ -116,6 +118,36 @@ class Network:
                             self.dict[self.lista_professores[i][0]], 0, self.lista_professores[i][1])
 
         print('Dicionário: ', self.dict)
+
+        for i in range(len(self.lista_professores)-1):
+            cont = 2
+            for j in range(5):
+                match cont:
+                    case 2:
+                        self.add_aresta(
+                            self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 0)
+                    case 3:
+                        self.add_aresta(
+                            self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 3)
+                    case 4:
+                        self.add_aresta(
+                            self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 5)
+                    case 5:
+                        if(self.lista_professores[i][cont] != ''):
+                            self.add_aresta(
+                                self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 8)
+                    case 6:
+                        if(self.lista_professores[i][cont] != ''):
+                            self.add_aresta(
+                                self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 10)
+                cont += 1
+
+        for i in range(len(self.lista_disciplinas)-1):
+            self.add_aresta(self.dic[self.lista_disciplinas[i][0]], self.dic[self.lista_disciplinas[len(
+                self.lista_disciplinas)-1][2]], 0, int(self.lista_disciplinas[i][2]))
+        self.t = int(self.lista_disciplinas[-1][2])
+        self.demand.append(self.s)
+        self.demand.append(self.t)
 
     def bellman_ford(self, s, t):
         dist = [float("inf")
