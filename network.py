@@ -9,6 +9,7 @@ class Network:
         self.dict_disc = {}
         self.lista_professores = []
         self.lista_disciplinas = []
+        self.dicionario = {}
 
         if adjacent_list == None:
             self.adjacent_list = [[] for i in range(size_vertices)]
@@ -52,10 +53,11 @@ class Network:
                 next(csv_reader)  # pula primeira linha
                 self.lista_professores = list(csv_reader)
                 print('\nVetor de professores: \n', self.lista_professores)
+                self.criar_rede()
         except IOError:
             print("Nao foi possivel encontrar ou ler o arquivo!")
             return False
-
+        
     def ler_arquivo_disciplinas(self, nome_arq):
         try:
             with open(nome_arq, 'r') as csv_file:
@@ -63,6 +65,7 @@ class Network:
                 next(csv_reader)  # Pula cabeçalho
                 self.lista_disciplinas = list(csv_reader)
                 print('\nVetor de disciplinas: \n', self.lista_disciplinas)
+                self.criar_rede()
         except IOError:
             print("Nao foi possivel encontrar ou ler o arquivo!")
             return False
@@ -99,7 +102,7 @@ class Network:
                     self.arestas_list.append((i, j, w))
 
     def add_Dictionary(self, value, key):
-        self.dict[value] = key
+        self.dicionario[value] = key
 
     def criar_rede(self):
         tamanho_professores = len(self.lista_professores)
@@ -107,54 +110,25 @@ class Network:
         proxima_chave = 0
 
         for i in range(tamanho_professores):
-            self.dict(self.lista_professores[i][0], i)
+            self.add_Dictionary(self.lista_professores[i][0], i)
             proxima_chave = i+1
 
         for i in range(tamanho_disciplinas):
             if self.lista_disciplinas[i][0] != None:
-                self.dict(self.lista_disciplinas[i][0], proxima_chave)
+                self.add_Dictionary(self.lista_disciplinas[i][0], i)
                 proxima_chave = proxima_chave+1
 
         for i in range(tamanho_disciplinas):
-            if self.lista_disciplinas[i][1] != None:
-                self.dict(self.lista_disciplinas[i][1], proxima_chave)
+            if self.lista_disciplinas[i][0] != None:
+                self.add_Dictionary(self.lista_disciplinas[i][0], proxima_chave)
                 proxima_chave = proxima_chave+1
 
-        for i in range(len(self.lista_professores)-1):
-            self.add_aresta(self.dict[self.lista_professores[-1][1]],
-                            self.dict[self.lista_professores[i][0]], 0, self.lista_professores[i][1])
+        for i in range(tamanho_disciplinas):
+            if self.lista_disciplinas[i][1]!=None:
+                self.add_Dictionary(self.lista_disciplinas[i][1], proxima_chave)
+                proxima_chave = proxima_chave + 1
 
-        print('Dicionário: ', self.dict)
-
-        for i in range(len(self.lista_professores)-1):
-            cont = 2
-            for j in range(5):
-                match cont:
-                    case 2:
-                        self.add_aresta(
-                            self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 0)
-                    case 3:
-                        self.add_aresta(
-                            self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 3)
-                    case 4:
-                        self.add_aresta(
-                            self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 5)
-                    case 5:
-                        if(self.lista_professores[i][cont] != ''):
-                            self.add_aresta(
-                                self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 8)
-                    case 6:
-                        if(self.lista_professores[i][cont] != ''):
-                            self.add_aresta(
-                                self.dic[self.lista_professores[i][0]], self.dic[self.lista_professores[i][cont]], 10)
-                cont += 1
-
-        for i in range(len(self.lista_disciplinas)-1):
-            self.add_aresta(self.dic[self.lista_disciplinas[i][0]], self.dic[self.lista_disciplinas[len(
-                self.lista_disciplinas)-1][2]], 0, int(self.lista_disciplinas[i][2]))
-        self.t = int(self.lista_disciplinas[-1][2])
-        self.demand.append(self.s)
-        self.demand.append(self.t)
+        print('Dicionário: ', self.dicionario)
 
     def juntar_professores_disciplinas(self, disc_informacoes, dados_prof, vert_inicial):
         (prof, numero_disc, disc_oferecidas) = dados_prof
@@ -168,7 +142,7 @@ class Network:
                 disc_informacoes.remove(j)
                 break
 
-    def lista_de_professores(self, prof, disc):
+    def SetSuperOferta(self, prof, disc):
         const = self.adjacent_matrix[0]
         copia = [0]
         copia = copia + disc.copy()
@@ -181,9 +155,67 @@ class Network:
         self.adjacent_matrix[0][0] = 0
         self.adjacent_list[0].pop(0)
 
+    def setSuperDemanda(self, vert_inicial, info_disciplinas):
+        capac_disc = [i[2] for i in info_disciplinas]
+        sdemanda = self.size_vertices - 1
+        capac = None
+
+        for i in range(vert_inicial, self.size_vertices - 1):
+            const = i
+            for _ in capac_disc:
+                capac = i
+                capac_disc.remove(i)
+                break
+            self.addEdge(const, sdemanda, capac)
+
+    def setProfparaDisc(self):
+        for i in range(len(self.lista_professores)-1):
+            cont = 0
+            for _ in range(5):
+                match cont:
+                    case 0:
+                        self.add_aresta(
+                            self.dict_prof[self.lista_professores[i][0]], self.dict_prof[self.lista_professores[i][cont+2]], 0)
+                    case 1:
+                        self.add_aresta(
+                            self.dict_prof[self.lista_professores[i][0]], self.dict_prof[self.lista_professores[i][cont+2]], 3)
+                    case 2:
+                        self.add_aresta(
+                            self.dict_prof[self.lista_professores[i][0]], self.dict_prof[self.lista_professores[i][cont+2]], 5)
+                    case 3:
+                        if(self.lista_professores[i][cont+2] != ''):
+                            self.add_aresta(
+                                self.dict_prof[self.lista_professores[i][0]], self.dict_prof[self.lista_professores[i][cont+2]], 8)
+                    case 4:
+                        if(self.lista_professores[i][cont+2] != ''):
+                            self.add_aresta(
+                                self.dict_prof[self.lista_professores[i][0]], self.dict_prof[self.lista_professores[i][cont+2]], 10)
+                cont += 1
+
+    def setDadosIniciais(self, info_prof, info_disc):
+        
+        (prof, disc_ofertadas) = info_prof
+        total_disc = info_disc
+
+        self.size_vertices = 2 + len(prof) + total_disc
+
+        self.adjacent_matrix = [[0 for _ in range(self.size_vertices)]
+                        for _ in range(self.size_vertices)]
+        self.adjacent_list = [[] for _ in range(self.size_vertices)]
+
+        self.SetSuperOferta(prof, disc_ofertadas)
+
+        self.setSuperDemanda(len(prof) + 1, info_disc) 
+
+        self.juntar_professores_disciplinas(len(prof) + 1, info_disc, info_prof)
+
+        self.setProfparaDisc()
+
+        self.add_lista_arestas()
+
     def bellman_ford(self, s, t):
-        dist = [float("inf")
-                for _ in range(len(self.adjacent_list))]  # Distance from s
+        dist = [float("inf") 
+        for _ in range(len(self.adjacent_list))]  # Distance from s
         # Predecessor in shortest path from s
         pred = [None for _ in range(len(self.adjacent_list))]
         dist[s] = 0
@@ -194,7 +226,7 @@ class Network:
                     dist[v] = dist[u] + w
                     pred[v] = u
                     updated = True
-            if updated is False:
+            if updated is False:  #interrompe a execução caso não haja mais caminho
                 break
 
         caminho = []
@@ -237,3 +269,53 @@ class Network:
                     self.cappacity[v][u] = - self.cappacity[v][u]
             C = self.bellman_ford(s, t)
         return F
+
+    def formatData(self, matrix: list):
+            prof = self.dict_prof.keys()
+            disc = self.dict_disc.keys()
+            edges = []
+            costs = [0, 3, 5, 8, 10]  # Based on preferences table
+            total_cost = 0
+            total_classes = 0
+
+            for i in range(0, len(matrix)):
+                for j in range(0, len(matrix[i])):
+                    if matrix[i][j] != 0:  # If the edge has flow
+                        if i in prof or j in disc:
+                            # Append edge in edges
+                            edges.append((i, j, matrix[i][j]))
+
+            print("\n")
+            print("{:<20} {:<20} {:<40} {:<40} {:<40}".format(
+                'Teacher', 'Subject', 'Name', 'Classes', 'Cost'))
+            for teacher, subject, classes in edges:
+
+                subject_id = self.dict_disc[subject][0]
+                teacher_subjects = self.dict_prof[teacher][2]
+                subject_cost = teacher_subjects.index(subject_id)
+
+                print("{:<20} {:<20} {:<40} {:<40} {:<40}"
+                    .format(self.dict_prof[teacher][0],  # Teacher name
+                            subject_id,  # Subject id
+                            self.dict_disc[subject][1],  # Subject name
+                            classes,  # Classes
+                            costs[subject_cost] * classes))  # Cost of allocation
+
+                total_cost += costs[subject_cost] * \
+                    classes  # Total cost of all allocations
+                total_classes += classes  # Total classes allocated
+
+            print(f"\nThe total cost was {total_cost}")
+            print(f"Total classes allocated: {total_classes}")
+
+            if len(self.lista_professores) != 0:
+                print(f"\nThis teachers dont offer any subject:")
+                print(*self.lista_professores, sep=", ")
+            else:
+                print("\nAll teachers offer at least one subject")
+
+    def executa(self, teachers_file, subjects_file):
+
+        self.setDadosIniciais(self.ler_arquivo_professores(teachers_file),
+                            self.ler_arquivo_disciplinas(subjects_file))
+        self.formatData(self.SucessivosCaminhosMinimos(0, self.size_vertices - 1))
