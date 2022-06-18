@@ -118,16 +118,6 @@ class Network:
                 self.add_Dictionary(self.lista_disciplinas[i][0], i)
                 proxima_chave = proxima_chave+1
 
-        for i in range(tamanho_disciplinas):
-            if self.lista_disciplinas[i][0] != None:
-                self.add_Dictionary(self.lista_disciplinas[i][0], proxima_chave)
-                proxima_chave = proxima_chave+1
-
-        for i in range(tamanho_disciplinas):
-            if self.lista_disciplinas[i][1]!=None:
-                self.add_Dictionary(self.lista_disciplinas[i][1], proxima_chave)
-                proxima_chave = proxima_chave + 1
-
         print('Dicionário: ', self.dicionario)
 
     def juntar_professores_disciplinas(self, disc_informacoes, dados_prof, vert_inicial):
