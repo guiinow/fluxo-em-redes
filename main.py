@@ -2,12 +2,8 @@ import network
 
 network = network.Network()
 
-# network.ler_arquivo_professores('./datasets/professores_toy.csv')
-# network.ler_arquivo_disciplinas('./datasets/disciplinas_toy.csv')
-# print(network.ler_arquivo_professores('./datasets/professores_toy.csv'))
+network.chamarFuncao(network.ler_arquivo_professores('./datasets/professores.csv'),
+                     network.ler_arquivo_disciplinas('./datasets/disciplinas.csv'))
 
-# prof = input("digite o nome do arquivo prof: ")
-# disc = input("digite o nome do arquivo disc: ")
-
-network.executa('professores_toy.csv', 'disciplinas_toy.csv')
-
+network.imprime(network.SucessivosCaminhosMinimos(
+    0, network.size_vertices - 1))
