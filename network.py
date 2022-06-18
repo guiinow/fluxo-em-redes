@@ -173,8 +173,8 @@ class Network:
 
     def chamarFuncao(self, info_prof, info_disc):
 
-        self.demand.append(int(self.lista_professores[-1][1]))
-        self.demand.append(-int(self.lista_disciplinas[-1][2]))
+        # self.demand.append(int(self.lista_professores[-1][1]))
+        # self.demand.append(-int(self.lista_disciplinas[-1][2]))
 
         (vet_nome, vet_disc, vet_pref) = info_prof
         (lista_disciplinas, soma_materia, num_diciplinas) = info_disc
@@ -286,7 +286,7 @@ class Network:
                   custo[custoDisc] * turmas)
 
             custoTotal += custo[custoDisc] * turmas
-            custoDisc += turmas
+            disciplinasTotal += turmas
 
         print(f"\nCusto Total {custoTotal}")
         print(f"Total Disciplinas Alocadas: {disciplinasTotal}")
